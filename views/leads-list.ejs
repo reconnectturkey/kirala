@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Lead Takip MVP</h1>
+    <nav>
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Dashboard</a>
+      <a href="/leads" class="<%= currentPath === '/leads' ? 'active' : '' %>">Lead Listesi</a>
+      <a href="/leads/new" class="<%= currentPath === '/leads/new' ? 'active' : '' %>">Yeni Lead</a>
+      <a href="/followups/today" class="<%= currentPath === '/followups/today' ? 'active' : '' %>">Bugünkü Takipler</a>
+      <a href="/followups/overdue" class="<%= currentPath === '/followups/overdue' ? 'active' : '' %>">Geciken Takipler</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-title">
+      <h2>Lead Listesi</h2>
+      <a class="btn" href="/leads/new">+ Yeni Lead</a>
+    </div>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ad Soyad</th><th>Telefon</th><th>Kaynak</th><th>Lead Türü</th>
+            <th>Bölge</th><th>Sorumlu</th><th>Durum</th><th>Son Görüşme</th><th>Sonraki Aksiyon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!leads.length) { %>
+            <tr><td colspan="9">Henüz lead girilmedi.</td></tr>
+          <% } %>
+          <% leads.forEach((lead) => { %>
+            <tr>
+              <td><strong><%= lead.full_name %></strong><br/><small><%= lead.short_note || '' %></small></td>
+              <td><%= lead.phone %></td>
+              <td><%= lead.source %></td>
+              <td><%= lead.lead_type %></td>
+              <td><%= lead.district || '-' %></td>
+              <td><%= lead.owner %></td>
+              <td><span class="status"><%= lead.status %></span></td>
+              <td><%= lead.last_contact_date || '-' %></td>
+              <td><%= lead.next_action_date || '-' %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

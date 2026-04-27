@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Lead Takip MVP</h1>
+    <nav>
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Dashboard</a>
+      <a href="/leads" class="<%= currentPath === '/leads' ? 'active' : '' %>">Lead Listesi</a>
+      <a href="/leads/new" class="<%= currentPath === '/leads/new' ? 'active' : '' %>">Yeni Lead</a>
+      <a href="/followups/today" class="<%= currentPath === '/followups/today' ? 'active' : '' %>">Bugünkü Takipler</a>
+      <a href="/followups/overdue" class="<%= currentPath === '/followups/overdue' ? 'active' : '' %>">Geciken Takipler</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Basit Dashboard</h2>
+    <section class="cards">
+      <article class="card"><h3>Toplam Lead</h3><p><%= counts.total || 0 %></p></article>
+      <article class="card"><h3>Aktif Lead</h3><p><%= counts.active || 0 %></p></article>
+      <article class="card"><h3>Kapanan İş</h3><p><%= counts.closed || 0 %></p></article>
+    </section>
+
+    <section class="table-wrap">
+      <h3>Kaynaklara Göre Dağılım</h3>
+      <table>
+        <thead>
+          <tr><th>Kaynak</th><th>Adet</th></tr>
+        </thead>
+        <tbody>
+          <% if (!sources.length) { %>
+            <tr><td colspan="2">Henüz lead yok.</td></tr>
+          <% } %>
+          <% sources.forEach((row) => { %>
+            <tr>
+              <td><%= row.source %></td>
+              <td><%= row.count %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

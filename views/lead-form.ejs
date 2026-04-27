@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Lead Takip MVP</h1>
+    <nav>
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Dashboard</a>
+      <a href="/leads" class="<%= currentPath === '/leads' ? 'active' : '' %>">Lead Listesi</a>
+      <a href="/leads/new" class="<%= currentPath === '/leads/new' ? 'active' : '' %>">Yeni Lead</a>
+      <a href="/followups/today" class="<%= currentPath === '/followups/today' ? 'active' : '' %>">Bugünkü Takipler</a>
+      <a href="/followups/overdue" class="<%= currentPath === '/followups/overdue' ? 'active' : '' %>">Geciken Takipler</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Yeni Lead Ekle</h2>
+    <form action="/leads" method="post" class="form-grid">
+      <label>Ad Soyad<input required name="full_name" /></label>
+      <label>Telefon<input required name="phone" /></label>
+
+      <label>Kaynak
+        <select required name="source">
+          <option value="">Seçiniz</option>
+          <% sources.forEach((item) => { %>
+            <option value="<%= item %>"><%= item %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>Lead Türü
+        <select required name="lead_type">
+          <option value="">Seçiniz</option>
+          <% types.forEach((item) => { %>
+            <option value="<%= item %>"><%= item %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>İlçe / Bölge<input name="district" /></label>
+      <label>Sorumlu Kişi
+        <select required name="owner">
+          <% users.forEach((item) => { %>
+            <option value="<%= item %>"><%= item %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>Durum
+        <select required name="status">
+          <% statuses.forEach((item) => { %>
+            <option value="<%= item %>" <%= item === 'Yeni' ? 'selected' : '' %>><%= item %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>Son Görüşme Tarihi<input type="date" name="last_contact_date" value="<%= today %>" /></label>
+      <label>Sonraki Aksiyon Tarihi<input type="date" name="next_action_date" /></label>
+
+      <label class="full">Kısa Not<textarea rows="3" name="short_note"></textarea></label>
+      <label class="full">Potansiyel Gelir Notu<textarea rows="2" name="revenue_note"></textarea></label>
+
+      <button type="submit" class="btn">Kaydet</button>
+    </form>
+  </main>
+</body>
+</html>

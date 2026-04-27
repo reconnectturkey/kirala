@@ -1,0 +1,16 @@
+{
+  "name": "kirala-lead-mvp",
+  "version": "1.0.0",
+  "description": "Basit web tabanli lead takip MVP",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "dayjs": "^1.11.13",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2"
+  }
+}
