@@ -80,6 +80,13 @@ input, select, textarea {
 }
 label.full { grid-column: 1 / -1; }
 
+.inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
 .table-wrap {
   margin-top: 16px;
   background: #fff;

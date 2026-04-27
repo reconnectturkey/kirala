@@ -19,7 +19,15 @@ db.exec(`
     next_action_date TEXT,
     revenue_note TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  )
+  );
+
+  CREATE TABLE IF NOT EXISTS lead_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lead_id INTEGER NOT NULL,
+    note TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
+  );
 `);
 
 const insertLead = db.prepare(`
@@ -33,9 +41,22 @@ const insertLead = db.prepare(`
 `);
 
 const listLeads = db.prepare(`
-  SELECT *
-  FROM leads
-  ORDER BY datetime(created_at) DESC, id DESC
+  SELECT
+    l.*,
+    (
+      SELECT ln.note
+      FROM lead_notes ln
+      WHERE ln.lead_id = l.id
+      ORDER BY datetime(ln.created_at) DESC, ln.id DESC
+      LIMIT 1
+    ) AS latest_note,
+    (
+      SELECT COUNT(*)
+      FROM lead_notes ln
+      WHERE ln.lead_id = l.id
+    ) AS note_count
+  FROM leads l
+  ORDER BY datetime(l.created_at) DESC, l.id DESC
 `);
 
 const todayFollowups = db.prepare(`
@@ -70,6 +91,19 @@ const sourceDistribution = db.prepare(`
   ORDER BY count DESC
 `);
 
+const updateLeadStatus = db.prepare(`
+  UPDATE leads
+  SET status = @status,
+      next_action_date = @next_action_date,
+      last_contact_date = @last_contact_date
+  WHERE id = @id
+`);
+
+const insertLeadNote = db.prepare(`
+  INSERT INTO lead_notes (lead_id, note)
+  VALUES (@lead_id, @note)
+`);
+
 module.exports = {
   db,
   insertLead,
@@ -77,5 +111,7 @@ module.exports = {
   todayFollowups,
   overdueFollowups,
   dashboardCounts,
-  sourceDistribution
+  sourceDistribution,
+  updateLeadStatus,
+  insertLeadNote
 };

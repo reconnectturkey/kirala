@@ -1,32 +1,42 @@
-# Lead Takip MVP (Startkey Loft / KD Ankara)
+# Lead ve İş Takip MVP (Startkey Loft / KD Ankara)
 
-Bu proje; ofise gelen leadleri tek yerden takip etmek için hazırlanmış, hızlı kurulum odaklı bir **Node.js + Express + SQLite** MVP'sidir.
+Bu proje; teknik olmayan kullanıcılar için **hızlı kurulumlu**, sade bir web tabanlı MVP'dir.
 
-## Neden bu yapı?
-- **Hızlı kurulum:** Sunucu + veritabanı tek projede.
-- **Teknik olmayan kullanım:** Form ve tablo temelli basit ekranlar.
-- **Geliştirilebilirlik:** İleride rol bazlı yetki, API, WhatsApp entegrasyonu eklenebilir.
+## 1) Teknoloji seçimi
+- **Node.js + Express + SQLite + EJS**
 
-## Ekranlar
-1. Dashboard (`/`)
-2. Lead listesi (`/leads`)
-3. Yeni lead formu (`/leads/new`)
-4. Bugünkü takipler (`/followups/today`)
-5. Geciken takipler (`/followups/overdue`)
+## 2) Neden bu teknoloji?
+- **Hızlı kurulum:** Tek komutla çalışır, ayrı veritabanı sunucusu gerekmez.
+- **Sade kullanım:** Form ve tablo odaklı arayüz.
+- **Geliştirilebilir yapı:** İleride login, yetki, entegrasyonlar kolayca eklenebilir.
 
-## Kurulum
+## 3) Mac kurulum komutları
 ```bash
+# 1) Klasör oluştur
+mkdir -p ~/Projects
+cd ~/Projects
+
+# 2) Projeyi al (repo URL'inizi yazın)
+git clone <REPO_URL> kirala-lead-mvp
+cd kirala-lead-mvp
+
+# 3) Bağımlılıkları kur
 npm install
+
+# 4) Uygulamayı başlat
+npm start
+```
+
+Geliştirme için otomatik yeniden başlatma:
+```bash
 npm run dev
 ```
 
-Ardından: `http://localhost:3000`
-
-## Proje yapısı
+## 4) Oluşturulan dosyalar
 ```text
 src/
   constants.js   # Kaynaklar, türler, durumlar, roller
-  db.js          # SQLite tablo + sorgular
+  db.js          # SQLite tablo + sorgular + notlar + durum güncelleme
   server.js      # Route'lar ve uygulama başlatma
 views/
   dashboard.ejs
@@ -37,8 +47,17 @@ public/
   styles.css
 ```
 
-## Bir sonraki adımlar
-- Gerçek kullanıcılar için giriş sistemi (admin/danışman/operasyon)
-- Lead geçmişi ve aktivite logu
-- Filtreleme, arama, Excel dışa aktarma
-- WhatsApp / form entegrasyon webhookları
+## İlk sürümde olanlar
+- Lead ekleme
+- Lead listesi
+- Bugünkü takipler
+- Geciken takipler
+- Durum değiştirme
+- Not ekleme
+
+## İlk sürümde olmayanlar
+- Giriş/üyelik
+- Gelişmiş yetki
+- Ödeme
+- WhatsApp entegrasyonu
+- Yapay zeka analizi

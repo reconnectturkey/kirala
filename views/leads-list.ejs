@@ -28,25 +28,49 @@
       <table>
         <thead>
           <tr>
-            <th>Ad Soyad</th><th>Telefon</th><th>Kaynak</th><th>Lead Türü</th>
-            <th>Bölge</th><th>Sorumlu</th><th>Durum</th><th>Son Görüşme</th><th>Sonraki Aksiyon</th>
+            <th>Lead</th>
+            <th>Detay</th>
+            <th>Durum Güncelle</th>
+            <th>Not Ekle</th>
           </tr>
         </thead>
         <tbody>
           <% if (!leads.length) { %>
-            <tr><td colspan="9">Henüz lead girilmedi.</td></tr>
+            <tr><td colspan="4">Henüz lead girilmedi.</td></tr>
           <% } %>
           <% leads.forEach((lead) => { %>
             <tr>
-              <td><strong><%= lead.full_name %></strong><br/><small><%= lead.short_note || '' %></small></td>
-              <td><%= lead.phone %></td>
-              <td><%= lead.source %></td>
-              <td><%= lead.lead_type %></td>
-              <td><%= lead.district || '-' %></td>
-              <td><%= lead.owner %></td>
-              <td><span class="status"><%= lead.status %></span></td>
-              <td><%= lead.last_contact_date || '-' %></td>
-              <td><%= lead.next_action_date || '-' %></td>
+              <td>
+                <strong><%= lead.full_name %></strong><br/>
+                <small><%= lead.phone %></small><br/>
+                <small>Kaynak: <%= lead.source %></small>
+              </td>
+              <td>
+                Tür: <%= lead.lead_type %><br/>
+                Bölge: <%= lead.district || '-' %><br/>
+                Sorumlu: <%= lead.owner %><br/>
+                Durum: <span class="status"><%= lead.status %></span><br/>
+                Sonraki takip: <%= lead.next_action_date || '-' %><br/>
+                Not sayısı: <%= lead.note_count || 0 %><br/>
+                Son not: <%= lead.latest_note || '-' %>
+              </td>
+              <td>
+                <form method="post" action="/leads/<%= lead.id %>/status" class="inline-form">
+                  <select name="status" required>
+                    <% statuses.forEach((statusItem) => { %>
+                      <option value="<%= statusItem %>" <%= lead.status === statusItem ? 'selected' : '' %>><%= statusItem %></option>
+                    <% }); %>
+                  </select>
+                  <input type="date" name="next_action_date" value="<%= lead.next_action_date || '' %>" />
+                  <button class="btn" type="submit">Kaydet</button>
+                </form>
+              </td>
+              <td>
+                <form method="post" action="/leads/<%= lead.id %>/notes" class="inline-form">
+                  <textarea name="note" rows="3" required placeholder="Kısa not girin"></textarea>
+                  <button class="btn" type="submit">Not Ekle</button>
+                </form>
+              </td>
             </tr>
           <% }); %>
         </tbody>

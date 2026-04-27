@@ -8,7 +8,9 @@ const {
   todayFollowups,
   overdueFollowups,
   dashboardCounts,
-  sourceDistribution
+  sourceDistribution,
+  updateLeadStatus,
+  insertLeadNote
 } = require('./db');
 
 const {
@@ -29,6 +31,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
+  res.locals.statuses = LEAD_STATUSES;
   next();
 });
 
@@ -45,7 +48,7 @@ app.get('/', (req, res) => {
 
 app.get('/leads', (req, res) => {
   const leads = listLeads.all();
-  res.render('leads-list', { title: 'Lead Listesi', leads, dayjs });
+  res.render('leads-list', { title: 'Lead Listesi', leads });
 });
 
 app.get('/leads/new', (req, res) => {
@@ -76,6 +79,30 @@ app.post('/leads', (req, res) => {
 
   insertLead.run(payload);
   res.redirect('/leads');
+});
+
+app.post('/leads/:id/status', (req, res) => {
+  updateLeadStatus.run({
+    id: Number(req.params.id),
+    status: req.body.status,
+    next_action_date: req.body.next_action_date || null,
+    last_contact_date: dayjs().format('YYYY-MM-DD')
+  });
+
+  res.redirect(req.get('referer') || '/leads');
+});
+
+app.post('/leads/:id/notes', (req, res) => {
+  const note = (req.body.note || '').trim();
+
+  if (note) {
+    insertLeadNote.run({
+      lead_id: Number(req.params.id),
+      note
+    });
+  }
+
+  res.redirect(req.get('referer') || '/leads');
 });
 
 app.get('/followups/today', (req, res) => {
