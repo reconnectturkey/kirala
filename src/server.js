@@ -5,12 +5,15 @@ const dayjs = require('dayjs');
 const {
   insertLead,
   listLeads,
+  getLeadById,
+  updateLead,
   todayFollowups,
   overdueFollowups,
   dashboardCounts,
   sourceDistribution,
   updateLeadStatus,
-  insertLeadNote
+  insertLeadNote,
+  archiveLead
 } = require('./db');
 
 const {
@@ -32,6 +35,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.statuses = LEAD_STATUSES;
+  res.locals.users = USERS;
   next();
 });
 
@@ -47,8 +51,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/leads', (req, res) => {
-  const leads = listLeads.all();
-  res.render('leads-list', { title: 'Lead Listesi', leads });
+  const filters = {
+    owner: (req.query.owner || '').trim(),
+    status: (req.query.status || '').trim(),
+    query: (req.query.q || '').trim(),
+    show_archived: req.query.show_archived === '1' ? 1 : 0
+  };
+
+  const leads = listLeads.all(filters);
+
+  res.render('leads-list', {
+    title: 'Lead Listesi',
+    leads,
+    filters
+  });
 });
 
 app.get('/leads/new', (req, res) => {
@@ -81,6 +97,42 @@ app.post('/leads', (req, res) => {
   res.redirect('/leads');
 });
 
+app.get('/leads/:id/edit', (req, res) => {
+  const lead = getLeadById.get({ id: Number(req.params.id) });
+
+  if (!lead) {
+    return res.status(404).send('Lead bulunamadı');
+  }
+
+  return res.render('lead-edit', {
+    title: 'Lead Düzenle',
+    lead,
+    sources: LEAD_SOURCES,
+    types: LEAD_TYPES,
+    statuses: LEAD_STATUSES,
+    users: USERS
+  });
+});
+
+app.post('/leads/:id/edit', (req, res) => {
+  updateLead.run({
+    id: Number(req.params.id),
+    full_name: req.body.full_name,
+    phone: req.body.phone,
+    source: req.body.source,
+    lead_type: req.body.lead_type,
+    district: req.body.district || null,
+    short_note: req.body.short_note || null,
+    owner: req.body.owner,
+    status: req.body.status,
+    last_contact_date: req.body.last_contact_date || null,
+    next_action_date: req.body.next_action_date || null,
+    revenue_note: req.body.revenue_note || null
+  });
+
+  res.redirect('/leads');
+});
+
 app.post('/leads/:id/status', (req, res) => {
   updateLeadStatus.run({
     id: Number(req.params.id),
@@ -102,6 +154,16 @@ app.post('/leads/:id/notes', (req, res) => {
     });
   }
 
+  res.redirect(req.get('referer') || '/leads');
+});
+
+app.post('/leads/:id/archive', (req, res) => {
+  archiveLead.run({ id: Number(req.params.id), is_archived: 1 });
+  res.redirect(req.get('referer') || '/leads');
+});
+
+app.post('/leads/:id/unarchive', (req, res) => {
+  archiveLead.run({ id: Number(req.params.id), is_archived: 0 });
   res.redirect(req.get('referer') || '/leads');
 });
 

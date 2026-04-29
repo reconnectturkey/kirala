@@ -24,6 +24,40 @@
       <a class="btn" href="/leads/new">+ Yeni Lead</a>
     </div>
 
+    <form method="get" action="/leads" class="filter-grid">
+      <label>Arama
+        <input type="text" name="q" placeholder="Ad, telefon, bölge" value="<%= filters.query %>" />
+      </label>
+
+      <label>Sorumlu Kişi
+        <select name="owner">
+          <option value="">Tümü</option>
+          <% users.forEach((userItem) => { %>
+            <option value="<%= userItem %>" <%= filters.owner === userItem ? 'selected' : '' %>><%= userItem %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>Durum
+        <select name="status">
+          <option value="">Tümü</option>
+          <% statuses.forEach((statusItem) => { %>
+            <option value="<%= statusItem %>" <%= filters.status === statusItem ? 'selected' : '' %>><%= statusItem %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label class="checkbox-row">
+        <input type="checkbox" name="show_archived" value="1" <%= filters.show_archived ? 'checked' : '' %> />
+        Arşivdekileri de göster
+      </label>
+
+      <div class="filter-actions">
+        <button class="btn" type="submit">Filtrele</button>
+        <a href="/leads" class="btn btn-secondary">Sıfırla</a>
+      </div>
+    </form>
+
     <section class="table-wrap">
       <table>
         <thead>
@@ -32,16 +66,19 @@
             <th>Detay</th>
             <th>Durum Güncelle</th>
             <th>Not Ekle</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
           <% if (!leads.length) { %>
-            <tr><td colspan="4">Henüz lead girilmedi.</td></tr>
+            <tr><td colspan="5">Filtreye uygun lead bulunamadı.</td></tr>
           <% } %>
           <% leads.forEach((lead) => { %>
             <tr>
               <td>
-                <strong><%= lead.full_name %></strong><br/>
+                <strong><%= lead.full_name %></strong>
+                <% if (lead.is_archived) { %><span class="badge">Arşivde</span><% } %>
+                <br/>
                 <small><%= lead.phone %></small><br/>
                 <small>Kaynak: <%= lead.source %></small>
               </td>
@@ -70,6 +107,20 @@
                   <textarea name="note" rows="3" required placeholder="Kısa not girin"></textarea>
                   <button class="btn" type="submit">Not Ekle</button>
                 </form>
+              </td>
+              <td>
+                <div class="inline-form">
+                  <a href="/leads/<%= lead.id %>/edit" class="btn btn-secondary">Düzenle</a>
+                  <% if (!lead.is_archived) { %>
+                    <form method="post" action="/leads/<%= lead.id %>/archive">
+                      <button class="btn btn-danger" type="submit">Arşivle</button>
+                    </form>
+                  <% } else { %>
+                    <form method="post" action="/leads/<%= lead.id %>/unarchive">
+                      <button class="btn" type="submit">Aktife Al</button>
+                    </form>
+                  <% } %>
+                </div>
               </td>
             </tr>
           <% }); %>
