@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Lead Takip MVP</h1>
+    <nav>
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Dashboard</a>
+      <a href="/leads" class="<%= currentPath === '/leads' ? 'active' : '' %>">Lead Listesi</a>
+      <a href="/leads/new" class="<%= currentPath === '/leads/new' ? 'active' : '' %>">Yeni Lead</a>
+      <a href="/followups/today" class="<%= currentPath === '/followups/today' ? 'active' : '' %>">Bugünkü Takipler</a>
+      <a href="/followups/overdue" class="<%= currentPath === '/followups/overdue' ? 'active' : '' %>">Geciken Takipler</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2><%= title %></h2>
+    <p><%= subtitle %></p>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Lead</th><th>Mevcut Durum</th><th>Durum Güncelle</th></tr>
+        </thead>
+        <tbody>
+          <% if (!leads.length) { %>
+            <tr><td colspan="3"><%= emptyMessage %></td></tr>
+          <% } %>
+          <% leads.forEach((lead) => { %>
+            <tr>
+              <td>
+                <strong><%= lead.full_name %></strong><br/>
+                <small><%= lead.phone %></small><br/>
+                <small>Sorumlu: <%= lead.owner %></small>
+              </td>
+              <td>
+                Durum: <span class="status"><%= lead.status %></span><br/>
+                Sonraki aksiyon: <%= lead.next_action_date || '-' %>
+              </td>
+              <td>
+                <form method="post" action="/leads/<%= lead.id %>/status" class="inline-form">
+                  <select name="status" required>
+                    <% statuses.forEach((statusItem) => { %>
+                      <option value="<%= statusItem %>" <%= lead.status === statusItem ? 'selected' : '' %>><%= statusItem %></option>
+                    <% }); %>
+                  </select>
+                  <input type="date" name="next_action_date" value="<%= lead.next_action_date || '' %>" />
+                  <button class="btn" type="submit">Kaydet</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

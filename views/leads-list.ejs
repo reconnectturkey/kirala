@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Lead Takip MVP</h1>
+    <nav>
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Dashboard</a>
+      <a href="/leads" class="<%= currentPath === '/leads' ? 'active' : '' %>">Lead Listesi</a>
+      <a href="/leads/new" class="<%= currentPath === '/leads/new' ? 'active' : '' %>">Yeni Lead</a>
+      <a href="/followups/today" class="<%= currentPath === '/followups/today' ? 'active' : '' %>">Bugünkü Takipler</a>
+      <a href="/followups/overdue" class="<%= currentPath === '/followups/overdue' ? 'active' : '' %>">Geciken Takipler</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-title">
+      <h2>Lead Listesi</h2>
+      <a class="btn" href="/leads/new">+ Yeni Lead</a>
+    </div>
+
+    <form method="get" action="/leads" class="filter-grid">
+      <label>Arama
+        <input type="text" name="q" placeholder="Ad, telefon, bölge" value="<%= filters.query %>" />
+      </label>
+
+      <label>Sorumlu Kişi
+        <select name="owner">
+          <option value="">Tümü</option>
+          <% users.forEach((userItem) => { %>
+            <option value="<%= userItem %>" <%= filters.owner === userItem ? 'selected' : '' %>><%= userItem %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label>Durum
+        <select name="status">
+          <option value="">Tümü</option>
+          <% statuses.forEach((statusItem) => { %>
+            <option value="<%= statusItem %>" <%= filters.status === statusItem ? 'selected' : '' %>><%= statusItem %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label class="checkbox-row">
+        <input type="checkbox" name="show_archived" value="1" <%= filters.show_archived ? 'checked' : '' %> />
+        Arşivdekileri de göster
+      </label>
+
+      <div class="filter-actions">
+        <button class="btn" type="submit">Filtrele</button>
+        <a href="/leads" class="btn btn-secondary">Sıfırla</a>
+      </div>
+    </form>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Detay</th>
+            <th>Durum Güncelle</th>
+            <th>Not Ekle</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!leads.length) { %>
+            <tr><td colspan="5">Filtreye uygun lead bulunamadı.</td></tr>
+          <% } %>
+          <% leads.forEach((lead) => { %>
+            <tr>
+              <td>
+                <strong><%= lead.full_name %></strong>
+                <% if (lead.is_archived) { %><span class="badge">Arşivde</span><% } %>
+                <br/>
+                <small><%= lead.phone %></small><br/>
+                <small>Kaynak: <%= lead.source %></small>
+              </td>
+              <td>
+                Tür: <%= lead.lead_type %><br/>
+                Bölge: <%= lead.district || '-' %><br/>
+                Sorumlu: <%= lead.owner %><br/>
+                Durum: <span class="status"><%= lead.status %></span><br/>
+                Sonraki takip: <%= lead.next_action_date || '-' %><br/>
+                Not sayısı: <%= lead.note_count || 0 %><br/>
+                Son not: <%= lead.latest_note || '-' %>
+              </td>
+              <td>
+                <form method="post" action="/leads/<%= lead.id %>/status" class="inline-form">
+                  <select name="status" required>
+                    <% statuses.forEach((statusItem) => { %>
+                      <option value="<%= statusItem %>" <%= lead.status === statusItem ? 'selected' : '' %>><%= statusItem %></option>
+                    <% }); %>
+                  </select>
+                  <input type="date" name="next_action_date" value="<%= lead.next_action_date || '' %>" />
+                  <button class="btn" type="submit">Kaydet</button>
+                </form>
+              </td>
+              <td>
+                <form method="post" action="/leads/<%= lead.id %>/notes" class="inline-form">
+                  <textarea name="note" rows="3" required placeholder="Kısa not girin"></textarea>
+                  <button class="btn" type="submit">Not Ekle</button>
+                </form>
+              </td>
+              <td>
+                <div class="inline-form">
+                  <a href="/leads/<%= lead.id %>/edit" class="btn btn-secondary">Düzenle</a>
+                  <% if (!lead.is_archived) { %>
+                    <form method="post" action="/leads/<%= lead.id %>/archive">
+                      <button class="btn btn-danger" type="submit">Arşivle</button>
+                    </form>
+                  <% } else { %>
+                    <form method="post" action="/leads/<%= lead.id %>/unarchive">
+                      <button class="btn" type="submit">Aktife Al</button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
